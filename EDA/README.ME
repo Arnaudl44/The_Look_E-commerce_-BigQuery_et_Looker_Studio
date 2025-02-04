@@ -1,551 +1,103 @@
--- I - Table orders 
+-- I - Table orders
 
--- 1) Nombre de lignes dans la table orders
+-- 1) Number of rows in the orders table
+SELECT * FROM `innate-path-415009.thelook_ecommerce.orders`; -- 125,122 rows
 
-SELECT *
-FROM `innate-path-415009.thelook_ecommerce.orders`;
--- 125 122 lignes 
-
--- 2) Nombre de commandes et d'utilisateur distincts
-
+-- 2) Number of distinct orders and users
 SELECT
   COUNT(DISTINCT order_id) AS number_of_orders,
   COUNT(DISTINCT user_id) AS number_of_customers,
   SUM(num_of_item) AS number_of_items_sold,
   SUM(num_of_item) / COUNT(DISTINCT order_id) AS average_items_per_order
-FROM `innate-path-415009.thelook_ecommerce.orders`;
--- 125 122 commandes, 80 130 utilisateurs, 181 652 produits vendus, 1,45 produits par commande
+FROM `innate-path-415009.thelook_ecommerce.orders`; -- 125,122 orders, 80,130 users, 181,652 products sold, 1.45 products per order
 
--- 3) Nombre de commandes par genre
-
-SELECT
-  gender,
-  COUNT(order_id) AS number_of_orders
+-- 3) Number of orders by gender
+SELECT gender, COUNT(order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
-GROUP BY gender;
--- 62 700 pour les femmes et 62 422 pour les hommes
+GROUP BY gender; -- 62,700 for women and 62,422 for men
 
--- 4) Nombre de commandes par statut de commande
-
-SELECT
-  status,
-  COUNT(DISTINCT order_id) AS number_of_orders
+-- 4) Number of orders by order status
+SELECT status, COUNT(DISTINCT order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
-GROUP BY status;
--- 37 490 shipped, 31 342 Complete, 24 971 Processing, 18 788 Cancelled, 12 531 Returned
+GROUP BY status; -- 37,490 Shipped, 31,342 Complete, 24,971 Processing, 18,788 Cancelled, 12,531 Returned
 
--- 5) Répartition des utilisateurs selon le nombre de commandes passées
-
+-- 5) Distribution of users by number of orders placed
 WITH total_orders AS (
-  SELECT
-    user_id,
-    COUNT(DISTINCT order_id) AS number_of_orders
+  SELECT user_id, COUNT(DISTINCT order_id) AS number_of_orders
   FROM `innate-path-415009.thelook_ecommerce.orders`
   GROUP BY user_id
 )
-
-SELECT 
-  number_of_orders,
-  COUNT(user_id)
+SELECT number_of_orders, COUNT(user_id)
 FROM total_orders
 GROUP BY number_of_orders
-ORDER BY 2 DESC;
--- 1 commande : 50 149 utilisateurs, 2 commandes : 19 948, 3 commandes : 5055, 4 commandes : 4978
+ORDER BY 2 DESC; -- 1 order: 50,149 users, 2 orders: 19,948, 3 orders: 5,055, 4 orders: 4,978
 
--- 6) Répartition des commandes par nombre de produits
-
-SELECT
-  num_of_item,
-  COUNT(order_id) AS number_of_orders
+-- 6) Distribution of orders by number of products
+SELECT num_of_item, COUNT(order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY num_of_item
-ORDER BY 2 DESC;
--- 1 produit : 87 944, 2 produits : 25 018, 3 produits : 6 318, 4 produits : 6 292
+ORDER BY 2 DESC; -- 1 product: 87,944, 2 products: 25,018, 3 products: 6,318, 4 products: 6,292
 
--- 7) Nombre de commandes et d'utilisateurs par année
-
-SELECT
-  EXTRACT(YEAR FROM created_at) AS yr,
-  COUNT(DISTINCT order_id) AS number_of_orders,
-  COUNT(DISTINCT user_id) AS number_of_users
+-- 7) Number of orders and users per year
+SELECT EXTRACT(YEAR FROM created_at) AS yr, COUNT(DISTINCT order_id) AS number_of_orders, COUNT(DISTINCT user_id) AS number_of_users
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY 1
-ORDER BY 1;
--- Passage de 2 193 commandes en 2019 (année incomplète) à 39 866 en 2024 (stabilisation entre 2023 et 2024)
--- 2050 customers en 2019 et 30 793 en 2024
+ORDER BY 1; -- Increase from 2,193 orders in 2019 to 39,866 in 2024 (stabilization between 2023 and 2024). 2,050 customers in 2019 and 30,793 in 2024.
 
--- 8) Nombre de commandes et d'utilisateurs par mois sur l'ensemble de la période 2019 - 2024
+-- 8) Number of orders and users per month (2019-2024)
+SELECT EXTRACT(MONTH FROM created_at) AS mo, COUNT(DISTINCT order_id) AS number_of_orders, COUNT(DISTINCT user_id) AS number_of_users
+FROM `innate-path-415009.thelook_ecommerce.orders`
+GROUP BY 1
+ORDER BY 1; -- June has the highest activity. Activity increases from March to June and then decreases from July.
 
-SELECT
-  EXTRACT(MONTH FROM created_at) AS mo,
-  COUNT(DISTINCT order_id) AS number_of_orders,
-  COUNT(DISTINCT user_id) AS number_of_users
-FROM 
-  `innate-path-415009.thelook_ecommerce.orders`
-GROUP BY
-  1
-ORDER BY
-  1;
--- C'est en juin que l'activité est la plus soutenue
--- L'activité augmente de mars à juin puis redescend à partir de juillet
+-- 9) Number of orders by status, year, and month
+SELECT EXTRACT(YEAR FROM created_at) AS yr, COUNT(order_id) AS total_orders,
+       COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) AS Processing,
+       ROUND(COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Processing,
+       COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) AS Complete,
+       ROUND(COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Complete,
+       COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) AS Shipped,
+       ROUND(COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Shipped,
+       COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) AS Returned,
+       ROUND(COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Returned,
+       COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) AS Cancelled,
+       ROUND(COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Cancelled
+FROM `innate-path-415009.thelook_ecommerce.orders`
+GROUP BY 1
+ORDER BY 1; -- Return rate is stable (around 10%), as is the cancellation rate (15%).
 
--- 9) Nombre de commandes par statut, année et mois
-
-SELECT
-  EXTRACT(YEAR FROM created_at) AS yr,
-  COUNT(order_id) AS total_orders,
-  COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) AS Processing,
-  ROUND(COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Processing,
-  COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) AS Complete,
-  ROUND(COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Complete,
-  COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) AS Shipped,
-  ROUND(COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Shipped,
-  COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) AS Returned,
-  ROUND(COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Returned,
-  COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) AS Cancelled,
-  ROUND(COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Cancelled
-FROM 
-  `innate-path-415009.thelook_ecommerce.orders`
-GROUP BY 
-  1
-ORDER BY 
-  1;
--- Le taux de retour est stable (autour de 10%), idem pour le taux d'abandon (15%)
-
--- 10) Délais moyens de livraison
-
+-- 10) Average delivery time
 WITH CTE AS (
-  SELECT
-    order_id,
-    EXTRACT(YEAR FROM created_at) AS yr,
-    TIMESTAMP_DIFF(delivered_at, shipped_at, DAY) AS days_diff
-  FROM 
-    `innate-path-415009.thelook_ecommerce.orders`
+  SELECT order_id, EXTRACT(YEAR FROM created_at) AS yr, TIMESTAMP_DIFF(delivered_at, shipped_at, DAY) AS days_diff
+  FROM `innate-path-415009.thelook_ecommerce.orders`
 )
-
-SELECT 
-  yr,
-  ROUND(AVG(days_diff), 2) AS Average_delivery_time
+SELECT yr, ROUND(AVG(days_diff), 2) AS Average_delivery_time
 FROM CTE
 GROUP BY 1
-ORDER BY 1;
--- Délais de livraison stables sur la période (environ 2 jours)
+ORDER BY 1; -- Delivery times are stable over the period (approximately 2 days).
 
--- 11) Délais moyens d'envoi
-
+-- 11) Average shipping time
 WITH CTE AS (
-  SELECT
-    order_id,
-    EXTRACT(YEAR FROM created_at) AS yr,
-    TIMESTAMP_DIFF(shipped_at, created_at, DAY) AS days_diff
-  FROM 
-    `innate-path-415009.thelook_ecommerce.orders`
+  SELECT order_id, EXTRACT(YEAR FROM created_at) AS yr, TIMESTAMP_DIFF(shipped_at, created_at, DAY) AS days_diff
+  FROM `innate-path-415009.thelook_ecommerce.orders`
 )
-
-SELECT 
-  yr,
-  ROUND(AVG(days_diff), 2) AS Average_shipping_time
+SELECT yr, ROUND(AVG(days_diff), 2) AS Average_shipping_time
 FROM CTE
 GROUP BY 1
-ORDER BY 1;
--- Délais d'envoi stables sur la période (environ 1 jour)
+ORDER BY 1; -- Shipping times are stable over the period (approximately 1 day).
+
 
 -- II - Table order_items
 
--- 1) Nombre de lignes dans la table order_items
+-- 1) Number of rows in the order_items table
+SELECT * FROM `innate-path-415009.thelook_ecommerce.order_items`; -- 181,652 rows (product level granularity)
 
-SELECT *
-FROM `innate-path-415009.thelook_ecommerce.order_items`;
--- 181 652 lignes (niveau de granularité au niveau du produit)
+-- 2) Total sales, number of products per order, and average order value (AOV) over the entire period
+SELECT ROUND(SUM(sale_price), 2) AS total_sales, ROUND(COUNT(*) / COUNT(DISTINCT order_id), 2) AS average_items_per_order, ROUND(SUM(sale_price) / COUNT(DISTINCT order_id), 2) AS AOV
+FROM `innate-path-415009.thelook_ecommerce.order_items`; -- Total sales: €10,784,634, 1.45 products per order, AOV: €86
 
--- 2) Total des ventes, nombre de produits par commande et montant moyen par commande sur l'ensemble de la période
-
-SELECT
-  ROUND(SUM(sale_price), 2) AS total_sales,
-  ROUND(COUNT(*) / COUNT(DISTINCT order_id), 2) AS average_items_per_order,
-  ROUND(SUM(sale_price) / COUNT(DISTINCT order_id), 2) AS AOV 
-FROM `innate-path-415009.thelook_ecommerce.order_items`;
--- Total des ventes sur la période : 10 784 634€, 1,45 produits par commande, montant moyen par commande : 86€
-
--- 3) Total des ventes, nombre de produits par commande et montant moyen par commande par année
-
-SELECT
-  EXTRACT(YEAR FROM created_at) AS yr,
-  ROUND(SUM(sale_price), 2) AS total_sales,
-  ROUND(COUNT(*) / COUNT(DISTINCT order_id), 2) AS average_items_per_order,
-  ROUND(SUM(sale_price) / COUNT(DISTINCT order_id), 2) AS AOV 
+-- 3) Total sales, number of products per order, and AOV per year
+SELECT EXTRACT(YEAR FROM created_at) AS yr, ROUND(SUM(sale_price), 2) AS total_sales, ROUND(COUNT(*) / COUNT(DISTINCT order_id), 2) AS average_items_per_order, ROUND(SUM(sale_price) / COUNT(DISTINCT order_id), 2) AS AOV
 FROM `innate-path-415009.thelook_ecommerce.order_items`
 GROUP BY 1
-ORDER BY 1;
--- Comme vu dans la table orders, l'activité a fortement augmenté jusqu'à 2023 avant de stabiliser en 2024.
--- Par ailleurs, on observe une certaine stabilité concernant le nombre de produits par commande et le montant moyen.
-
-
--- III - Table distribution_centers
-
--- 1) Nombre de lignes dans la table distribution_centers
-
-SELECT * 
-FROM `innate-path-415009.thelook_ecommerce.distribution_centers`; 
--- Il y a 10 centres tous situés aux USA
-
--- IV - Table inventory_items 
-
--- 1) Nombre de lignes dans la table inventory_items
-
-SELECT * 
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`;
--- 490 590 lignes
-
--- 2) Nombre de catégories, produits, marques
-
-SELECT 
-  COUNT(*) AS total_rows,
-  COUNT(DISTINCT product_id) AS unique_products,
-  COUNT(DISTINCT product_category) AS unique_categories,
-  COUNT(DISTINCT product_brand) AS unique_brands
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`;
--- 29 060 produits uniques, 26 catégories de produits et 2 754 marques 
-
--- 3) Répartition par catégorie et marque
-
-SELECT 
-  product_category, 
-  COUNT(product_id) AS number_of_products
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`
-GROUP BY product_category
-ORDER BY number_of_products DESC
-LIMIT 10;
--- La catégorie Intimates est la catégorie avec le plus de produits (36 516)
-
-SELECT 
-  product_brand, 
-  COUNT(product_id) AS number_of_products
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`
-GROUP BY product_brand
-ORDER BY number_of_products DESC
-LIMIT 10;
--- Allegra K est la marque avec le plus de produits avec 16 742 produits 
-
--- 4) Répartition des prix
-
-SELECT 
-  MIN(product_retail_price) AS min_price,
-  MAX(product_retail_price) AS max_price,
-  AVG(product_retail_price) AS avg_price,
-  COUNT(CASE WHEN product_retail_price < 10 THEN 1 ELSE NULL END) AS low_price_products
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`;
--- Prix minimum : 0.019, prix maximum : 999, prix moyen : 59,37, 21 563 produits dont le coût est < 10
-
--- 5) Vérification des distributions géographiques
-
-SELECT 
-  product_distribution_center_id, 
-  COUNT(product_id) AS number_of_products
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`
-GROUP BY product_distribution_center_id
-ORDER BY number_of_products DESC;
--- Les centres de ditsribution 1, 2 et 3 sont ceux qui ont le plus de produits en stock (> 60 000)
-
--- 6) Dates importantes
-
-SELECT 
-  MIN(created_at) AS oldest_product_sold,
-  MAX(created_at) AS most_recent_product_sold,
-  COUNT(CASE WHEN sold_at IS NOT NULL THEN 1 ELSE NULL END) AS products_sold
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`;
--- Première vente  le 26/11/2018 et vente laplus récente le 30/06/2024
-
--- 7) Produits invendus
-
-SELECT 
-  COUNT(*) AS unsold_products
-FROM `innate-path-415009.thelook_ecommerce.inventory_items`
-WHERE sold_at IS NULL;
--- 308 938 produits n'on pas été vendus
-
--- V - Table products 
-
--- 1) Nombre de lignes dans la table products
-
-SELECT *
-FROM `innate-path-415009.thelook_ecommerce.products` 
-
--- 2) Calcul des invendus
-
-SELECT 
-  p.category AS product_category,
-  p.brand AS product_brand,
-  COUNT(i.id) AS total_stock,
-  COUNT(CASE WHEN i.sold_at IS NULL THEN 1 ELSE NULL END) AS unsold_items,
-  CASE 
-    WHEN COUNT(i.id) = 0 THEN 0 
-    ELSE ROUND(
-      COUNT(CASE WHEN i.sold_at IS NULL THEN 1 ELSE NULL END) * 100.0 / COUNT(i.id), 
-      2
-    )
-  END AS shortage_rate
-FROM 
-  `innate-path-415009.thelook_ecommerce.products` p
-LEFT JOIN 
-  `innate-path-415009.thelook_ecommerce.inventory_items` i
-ON 
-  p.id = i.product_id
-GROUP BY 
-  p.category, p.brand
-ORDER BY 
-  3 DESC, 5 DESC;
-
--- Table avec avec les mêmes informations que la table inventory_items, à l'exception des colonnes "created_at" et "sold_at" qui ne sont pas présentes dans la table products
-
--- VI - Table users 
-
--- 1) Nombre de lignes dans la table users
-
-SELECT * 
-FROM `innate-path-415009.thelook_ecommerce.users`;
--- 100 000 utilisateurs
-
--- 2) Vérification unicité clé primaire
-
-SELECT
-id,
-COUNT(*)
-FROM `innate-path-415009.thelook_ecommerce.users` 
-GROUP BY id
-HAVING COUNT(*) > 1;
--- Confirmation de la colonne id comme clé primaire
-
--- 3) Nombre d'utilisateurs actifs (avec au moins une commande)
-
-SELECT
-u.id,
-COUNT(o.order_id)
-FROM `innate-path-415009.thelook_ecommerce.users` u
-LEFT JOIN `innate-path-415009.thelook_ecommerce.orders` o
-ON u.id = o.user_id 
-GROUP BY u.id
-HAVING COUNT(o.order_id) >= 1;
--- 80 130 utilisateurs ont commandé au moins 1 fois
-
--- 4) Nombre de commandes par pays
-
-WITH CTE AS (
-  SELECT
-    u.id AS user_id,
-    u.country,
-    COUNT(o.order_id) AS number_of_orders
-  FROM 
-    `innate-path-415009.thelook_ecommerce.users` u
-  LEFT JOIN 
-    `innate-path-415009.thelook_ecommerce.orders` o
-  ON 
-    u.id = o.user_id 
-  GROUP BY 
-    u.id, u.country
-  HAVING 
-    COUNT(o.order_id) >= 1
-)
-
-SELECT 
-  country,
-  SUM(number_of_orders) AS total_orders_by_country
-FROM 
-  CTE
-GROUP BY 
-  country
-ORDER BY 
-  total_orders_by_country DESC;
--- 1/3 des commandes proviennent de Chine, environ 70% des commandes proviennet de 3 pays (Chine, USA, Brésil)
-
--- 5) Exploration des utilisateurs n'ayant jamais passé de commande par pays
-
-WITH CTE1 AS ( 
-  SELECT
-    u.id AS user_id,
-    u.gender,
-    u.age,
-    u.country
-  FROM `innate-path-415009.thelook_ecommerce.users` u
-  LEFT JOIN `innate-path-415009.thelook_ecommerce.orders` o
-  ON u.id = o.user_id
-  WHERE o.user_id IS NULL
-),
-
-CTE2 AS (
-  SELECT 
-    country,
-    COUNT(id) AS number_of_users_by_country
-  FROM 
-    `innate-path-415009.thelook_ecommerce.users`
-  GROUP BY 
-    country
-)
-
-SELECT 
-  CTE1.country,
-  COUNT(CTE1.user_id) AS user_with_no_order,
-  CTE2.number_of_users_by_country AS number_of_total_registered_users,
-  ROUND(COUNT(CTE1.user_id) / CTE2.number_of_users_by_country * 100, 2) AS no_order_ratio
-FROM 
-  CTE1
-LEFT JOIN 
-  CTE2
-ON 
-  CTE1.country = CTE2.country
-GROUP BY 
-  CTE1.country, CTE2.number_of_users_by_country
-ORDER BY 
-  user_with_no_order DESC;
--- Les pays comme la Colombie, le Japon, et la Belgique affichent des ratios élevés d'utilisateurs enregistrés qui n'ont jamais commandé, ce qui peut indiquer un manque d'engagement ou des obstacles à l'achat. La chine et les États-Unis, bien que présentant des ratios plus faibles (19,61 % et 19,95 % respectivement), ont des bases d'utilisateurs importantes. Travailler sur des stratégies spécifiques pour convertir ces utilisateurs peut avoir un impact significatif sur les revenus.
-
--- 6) Nombre de commandes par source de trafic
-
-WITH CTE AS (
-  SELECT
-    u.id AS user_id,
-    u.traffic_source,
-    COUNT(o.order_id) AS number_of_orders
-  FROM 
-    `innate-path-415009.thelook_ecommerce.users` u
-  LEFT JOIN 
-    `innate-path-415009.thelook_ecommerce.orders` o
-  ON 
-    u.id = o.user_id 
-  GROUP BY 
-    u.id, u.traffic_source
-  HAVING 
-    COUNT(o.order_id) >= 1
-)
-
-SELECT 
-  traffic_source,
-  SUM(number_of_orders) AS total_orders_by_source
-FROM 
-  CTE
-GROUP BY 
-  traffic_source
-ORDER BY 
-  total_orders_by_source DESC;
-
--- VII - Table events
-
--- 1) Nombre de lignes dans la table events
-
-SELECT *
-FROM `innate-path-415009.thelook_ecommerce.events`;
--- 2 428 740 lignes
-
--- 2) Nombre d'évènements
-
-SELECT 
-  COUNT(*) AS number_of_events
-FROM `innate-path-415009.thelook_ecommerce.events`;
--- 2 428 740 évènements
-
--- 3) Nombre de sessions
-
-SELECT 
-  COUNT(DISTINCT session_id) AS number_of_sessions
-FROM `innate-path-415009.thelook_ecommerce.events`;
--- 681 652 sessions
-
--- 4) Nombre de sessions avec commandes
-
-SELECT 
-  COUNT(DISTINCT session_id) AS number_of_sessions
-FROM `innate-path-415009.thelook_ecommerce.events` 
-WHERE user_id IS NOT NULL;
--- 181 652 sessions avec commande
-
--- 5) Analyse des taux de conversion (ajouts au panier et achats) par session
-
-WITH CTE AS (
-  SELECT
-    session_id,
-    COUNT(CASE WHEN event_type = 'home' THEN 1 ELSE NULL END) AS home_visits,
-    COUNT(CASE WHEN event_type = 'department' THEN 1 ELSE NULL END) AS department_visits,
-    COUNT(CASE WHEN event_type = 'product' THEN 1 ELSE NULL END) AS product_views,
-    COUNT(CASE WHEN event_type = 'cart' THEN 1 ELSE NULL END) AS cart_additions,
-    COUNT(CASE WHEN event_type = 'purchase' THEN 1 ELSE NULL END) AS purchases,
-    COUNT(CASE WHEN event_type = 'cancel' THEN 1 ELSE NULL END) AS cancellations
-  FROM `innate-path-415009.thelook_ecommerce.events`
-  GROUP BY session_id
-)
-SELECT
-  SUM(product_views) AS total_product_views,
-  SUM(cart_additions) AS total_cart_additions,
-  SUM(purchases) AS total_purchases,
-  ROUND(SUM(cart_additions) / SUM(product_views) * 100, 2) AS cart_conversion_rate,
-  ROUND(SUM(purchases) / SUM(cart_additions) * 100, 2) AS purchase_conversion_rate
-FROM CTE;
--- Sur l'ensemble des sessions, 70,35% des vues produits se traduisent par un ajout au panier, et parmi ces ajouts, 30,55% aboutissent à un achat
-
--- 6) Volume d'abandons de paniers
-
-SELECT
-  COUNT(DISTINCT session_id) AS abandoned_sessions
-FROM `innate-path-415009.thelook_ecommerce.events`
-WHERE user_id IS NULL AND event_type = 'cart';
--- 250 000 sessions avec abandon de panier
-
--- 7) Vue agrégée des abandons de panier par source de trafic
-
-WITH AbandonedCartSessions AS (
-  SELECT
-    session_id,
-    traffic_source
-  FROM `innate-path-415009.thelook_ecommerce.events`
-  WHERE user_id IS NULL AND event_type = 'cart'
-)
-SELECT 
-  traffic_source,
-  COUNT(session_id) AS abandoned_sessions
-FROM AbandonedCartSessions
-GROUP BY traffic_source
-ORDER BY abandoned_sessions DESC;
--- Les abandons de panier sont majoritairement générés par les campagnes email (112,449 sessions), suivis par Adwords (74,719), tandis que le trafic organique enregistre le moins d'abandons (12,613 sessions)
-
--- 8) Analyse des abandons de panier par source de trafic avec taux d'abandon
-
-WITH AbandonedCartSessions AS (
-  SELECT
-    session_id,
-    traffic_source
-  FROM `innate-path-415009.thelook_ecommerce.events`
-  WHERE user_id IS NULL AND event_type = 'cart'
-),
-TotalSessions AS (
-  SELECT
-    traffic_source,
-    COUNT(DISTINCT session_id) AS number_of_total_sessions
-  FROM `innate-path-415009.thelook_ecommerce.events`
-  GROUP BY traffic_source
-)
-SELECT 
-  acs.traffic_source,
-  COUNT(acs.session_id) AS abandoned_sessions,
-  ts.number_of_total_sessions AS total_sessions_final,
-  ROUND(COUNT(acs.session_id) / ts.number_of_total_sessions * 100, 2) AS abandon_ratio
-FROM AbandonedCartSessions acs
-LEFT JOIN TotalSessions ts
-ON acs.traffic_source = ts.traffic_source
-GROUP BY acs.traffic_source, ts.number_of_total_sessions
-ORDER BY abandoned_sessions DESC;
--- Environ 36 % des sessions avec ajout au panier aboutissent à un abandon, avec des variations mineures selon les sources de trafic. Les emails génèrent le plus grand nombre d'abandons (112 449 sessions).
-
--- 9) Taux de conversion par mois
-
-SELECT
-  EXTRACT(MONTH FROM created_at) AS month,
-  SUM(CASE WHEN event_type = 'purchase' THEN 1 ELSE 0 END) AS total_purchases,
-  ROUND(
-    SUM(CASE WHEN event_type = 'purchase' THEN 1 ELSE 0 END) / COUNT(DISTINCT session_id) * 100, 2
-  ) AS purchase_conversion_rate
-FROM `innate-path-415009.thelook_ecommerce.events`
-GROUP BY month
-ORDER BY month;
--- Le taux de conversion des achats atteint son maximum en juin à 37.13%, tandis que juillet enregistre le minimum, avec 21.19%.
-
-
-
+ORDER BY 1; -- Activity increased significantly until 2023 before stabilizing in 2024. Number of products per order and AOV remain relatively stable.
