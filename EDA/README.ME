@@ -1,15 +1,14 @@
-# EDA (Exploratory Data Analysis) - The Look E-commerce
+# Analyse des données e-commerce
 
-## I - Table orders
+## I - Table `orders`
 
-### 1. Nombre de lignes dans la table orders
+### 1) Nombre de lignes dans la table `orders`
 ```sql
-SELECT *
-FROM `innate-path-415009.thelook_ecommerce.orders`;
+SELECT * FROM `innate-path-415009.thelook_ecommerce.orders`;
 ```
-**125 122 lignes**
+**Résultat** : 125 122 lignes
 
-### 2. Nombre de commandes et d'utilisateur distincts
+### 2) Nombre de commandes et d'utilisateurs distincts
 ```sql
 SELECT
   COUNT(DISTINCT order_id) AS number_of_orders,
@@ -18,161 +17,137 @@ SELECT
   SUM(num_of_item) / COUNT(DISTINCT order_id) AS average_items_per_order
 FROM `innate-path-415009.thelook_ecommerce.orders`;
 ```
-- **125 122 commandes**
-- **80 130 utilisateurs**
-- **181 652 produits vendus**
-- **1,45 produits par commande**
+**Résultat** : 125 122 commandes, 80 130 utilisateurs, 181 652 produits vendus, 1,45 produits par commande
 
-### 3. Nombre de commandes par genre
+### 3) Nombre de commandes par genre
 ```sql
-SELECT
-  gender,
-  COUNT(order_id) AS number_of_orders
+SELECT gender, COUNT(order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY gender;
 ```
-- **62 700 commandes par les femmes**
-- **62 422 commandes par les hommes**
+**Résultat** : 62 700 pour les femmes et 62 422 pour les hommes
 
-### 4. Nombre de commandes par statut de commande
+### 4) Nombre de commandes par statut de commande
 ```sql
-SELECT
-  status,
-  COUNT(DISTINCT order_id) AS number_of_orders
+SELECT status, COUNT(DISTINCT order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY status;
 ```
-- **37 490 shipped**
-- **31 342 complete**
-- **24 971 processing**
-- **18 788 cancelled**
-- **12 531 returned**
+**Résultat** : 
+- 37 490 Shipped
+- 31 342 Complete
+- 24 971 Processing
+- 18 788 Cancelled
+- 12 531 Returned
 
-### 5. Répartition des utilisateurs selon le nombre de commandes passées
+### 5) Répartition des utilisateurs selon le nombre de commandes passées
 ```sql
 WITH total_orders AS (
-  SELECT
-    user_id,
-    COUNT(DISTINCT order_id) AS number_of_orders
+  SELECT user_id, COUNT(DISTINCT order_id) AS number_of_orders
   FROM `innate-path-415009.thelook_ecommerce.orders`
   GROUP BY user_id
 )
-SELECT 
-  number_of_orders,
-  COUNT(user_id)
+SELECT number_of_orders, COUNT(user_id)
 FROM total_orders
 GROUP BY number_of_orders
 ORDER BY 2 DESC;
 ```
-- **1 commande : 50 149 utilisateurs**
-- **2 commandes : 19 948 utilisateurs**
-- **3 commandes : 5 055 utilisateurs**
-- **4 commandes : 4 978 utilisateurs**
+**Résultat** :
+- 1 commande : 50 149 utilisateurs
+- 2 commandes : 19 948
+- 3 commandes : 5 055
+- 4 commandes : 4 978
 
-### 6. Répartition des commandes par nombre de produits
+### 6) Répartition des commandes par nombre de produits
 ```sql
-SELECT
-  num_of_item,
-  COUNT(order_id) AS number_of_orders
+SELECT num_of_item, COUNT(order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY num_of_item
 ORDER BY 2 DESC;
 ```
-- **1 produit : 87 944 commandes**
-- **2 produits : 25 018 commandes**
-- **3 produits : 6 318 commandes**
-- **4 produits : 6 292 commandes**
+**Résultat** :
+- 1 produit : 87 944
+- 2 produits : 25 018
+- 3 produits : 6 318
+- 4 produits : 6 292
 
-### 7. Nombre de commandes et d'utilisateurs par année
+### 7) Nombre de commandes et d'utilisateurs par année
 ```sql
-SELECT
-  EXTRACT(YEAR FROM created_at) AS yr,
-  COUNT(DISTINCT order_id) AS number_of_orders,
-  COUNT(DISTINCT user_id) AS number_of_users
+SELECT EXTRACT(YEAR FROM created_at) AS yr,
+       COUNT(DISTINCT order_id) AS number_of_orders,
+       COUNT(DISTINCT user_id) AS number_of_users
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY 1
 ORDER BY 1;
 ```
-- **2019 (année incomplète)** : 2 193 commandes, 2 050 utilisateurs
-- **2024** : 39 866 commandes, 30 793 utilisateurs
+**Résultat** :
+- Passage de 2 193 commandes en 2019 (année incomplète) à 39 866 en 2024
+- 2 050 clients en 2019 et 30 793 en 2024
 
-### 8. Nombre de commandes et d'utilisateurs par mois sur l'ensemble de la période 2019 - 2024
+### 8) Nombre de commandes et d'utilisateurs par mois (2019 - 2024)
 ```sql
-SELECT
-  EXTRACT(MONTH FROM created_at) AS mo,
-  COUNT(DISTINCT order_id) AS number_of_orders,
-  COUNT(DISTINCT user_id) AS number_of_users
-FROM 
-  `innate-path-415009.thelook_ecommerce.orders`
-GROUP BY
-  1
-ORDER BY
-  1;
+SELECT EXTRACT(MONTH FROM created_at) AS mo,
+       COUNT(DISTINCT order_id) AS number_of_orders,
+       COUNT(DISTINCT user_id) AS number_of_users
+FROM `innate-path-415009.thelook_ecommerce.orders`
+GROUP BY 1
+ORDER BY 1;
 ```
-- **Juin** : Activité la plus soutenue
-- Activité en hausse de **mars à juin**, puis en baisse à partir de juillet
+**Observations** :
+- L'activité est la plus soutenue en juin
+- L'activité augmente de mars à juin puis redescend à partir de juillet
 
-### 9. Nombre de commandes par statut, année et mois
+### 9) Nombre de commandes par statut, année et mois
 ```sql
-SELECT
-  EXTRACT(YEAR FROM created_at) AS yr,
-  COUNT(order_id) AS total_orders,
-  COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) AS Processing,
-  ROUND(COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Processing,
-  COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) AS Complete,
-  ROUND(COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Complete,
-  COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) AS Shipped,
-  ROUND(COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Shipped,
-  COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) AS Returned,
-  ROUND(COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Returned,
-  COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) AS Cancelled,
-  ROUND(COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Cancelled
-FROM 
-  `innate-path-415009.thelook_ecommerce.orders`
-GROUP BY 
-  1
-ORDER BY 
-  1;
+SELECT EXTRACT(YEAR FROM created_at) AS yr,
+       COUNT(order_id) AS total_orders,
+       COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) AS Processing,
+       ROUND(COUNT(CASE WHEN status = 'Processing' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Processing,
+       COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) AS Complete,
+       ROUND(COUNT(CASE WHEN status = 'Complete' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Complete,
+       COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) AS Shipped,
+       ROUND(COUNT(CASE WHEN status = 'Shipped' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Shipped,
+       COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) AS Returned,
+       ROUND(COUNT(CASE WHEN status = 'Returned' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Returned,
+       COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) AS Cancelled,
+       ROUND(COUNT(CASE WHEN status = 'Cancelled' THEN order_id ELSE NULL END) / COUNT(order_id) * 100, 2) AS pct_Cancelled
+FROM `innate-path-415009.thelook_ecommerce.orders`
+GROUP BY 1
+ORDER BY 1;
 ```
-- **Taux de retour** : Stable (10%)
-- **Taux d'abandon** : Stable (15%)
+**Observations** :
+- Le taux de retour est stable (~10%)
+- Le taux d'annulation est autour de 15%
 
-### 10. Délais moyens de livraison
+### 10) Délais moyens de livraison
 ```sql
 WITH CTE AS (
-  SELECT
-    order_id,
-    EXTRACT(YEAR FROM created_at) AS yr,
-    TIMESTAMP_DIFF(delivered_at, shipped_at, DAY) AS days_diff
-  FROM 
-    `innate-path-415009.thelook_ecommerce.orders`
+  SELECT order_id,
+         EXTRACT(YEAR FROM created_at) AS yr,
+         TIMESTAMP_DIFF(delivered_at, shipped_at, DAY) AS days_diff
+  FROM `innate-path-415009.thelook_ecommerce.orders`
 )
-SELECT 
-  yr,
-  ROUND(AVG(days_diff), 2) AS Average_delivery_time
+SELECT yr, ROUND(AVG(days_diff), 2) AS Average_delivery_time
 FROM CTE
 GROUP BY 1
 ORDER BY 1;
 ```
-- **Délais moyens de livraison** : Environ 2 jours
+**Résultat** : Délais de livraison stables (~2 jours)
 
-### 11. Délais moyens d'envoi
+### 11) Délais moyens d'envoi
 ```sql
 WITH CTE AS (
-  SELECT
-    order_id,
-    EXTRACT(YEAR FROM created_at) AS yr,
-    TIMESTAMP_DIFF(shipped_at, created_at, DAY) AS days_diff
-  FROM 
-    `innate-path-415009.thelook_ecommerce.orders`
+  SELECT order_id,
+         EXTRACT(YEAR FROM created_at) AS yr,
+         TIMESTAMP_DIFF(shipped_at, created_at, DAY) AS days_diff
+  FROM `innate-path-415009.thelook_ecommerce.orders`
 )
-SELECT 
-  yr,
-  ROUND(AVG(days_diff), 2) AS Average_shipping_time
+SELECT yr, ROUND(AVG(days_diff), 2) AS Average_shipping_time
 FROM CTE
 GROUP BY 1
 ORDER BY 1;
 ```
-- **Délais moyens d'envoi** : Environ 1 jour
+**Résultat** : Délais d'envoi stables (~1 jour)
+```
 
-(Le contenu complet des requêtes a été condensé ici pour séparer chaque table dans le fichier.)
+💡 **Astuce** : Ce format Markdown est optimisé pour une visualisation sur GitHub avec des blocs de code SQL pour faciliter la lecture.
