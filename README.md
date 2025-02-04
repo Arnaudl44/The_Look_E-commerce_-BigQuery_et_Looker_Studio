@@ -112,7 +112,7 @@ FROM
 
 📌 **Visualisation des KPI's** :
 
-[![KPI Dashboard](images/Capture d’écran 2025-02-03 165502_KPI.png)](https://raw.githubusercontent.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165502_KPI.png)
+![KPI Dashboard](images/Capture%20d’écran%202025-02-03%20165502_KPI.png)
 
 ---
 
