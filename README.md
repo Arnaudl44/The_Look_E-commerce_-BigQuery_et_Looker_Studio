@@ -40,6 +40,7 @@ Une fois les données disponibles dans BigQuery, j’ai effectué une **Explorat
 4. **Exploration de la table `events`** : Étude du comportement des utilisateurs sur le site, avec analyse des interactions (`cart`, `purchase`, `product`, `home`…), et vérification de l’impact des `user_id` null sur la navigation.  
 
 ⚡ **Les requêtes SQL utilisées pour l’EDA sont disponibles dans un dossier dédié.**  
+⚡ **Pour visualiser les KPI principaux, consultez les images disponibles dans le dossier images.**  
 
 ---
 
@@ -110,10 +111,6 @@ SELECT
 FROM 
   `thelook_ecommerce.order_items_x_products`;
 
-📌 **Visualisation des KPI's** :
-
-![KPI Dashboard](https://raw.githubusercontent.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/main/images/KPI.png)
-
 ---
 
 ### 📅 Principaux KPI's par année et mois  
@@ -139,9 +136,6 @@ GROUP BY
 ORDER BY 
   1, 2;
 
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165623_Ventes_globales.png)
-
-
 ### 📊 Répartition des utilisateurs selon le nombre de commandes passées  
 
 ```sql
@@ -165,8 +159,6 @@ GROUP BY
 ORDER BY 
   total_users DESC; -- Trier par nombre d'utilisateurs en ordre décroissant
 
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165853_Commandes_par_client.png)
-
 ### 📊 Répartition des commandes par nombre de produits  
 
 ```sql
@@ -179,8 +171,6 @@ GROUP BY
   num_of_item
 ORDER BY 
   number_of_orders DESC; -- Trier par nombre de commandes en ordre décroissant
-
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165806_Nombre_produits_par%20commande.png)
 
 ### 📊 Saisonnalité des ventes  
 
@@ -204,8 +194,6 @@ GROUP BY
 ORDER BY 
   mo; -- Trier par mois
 
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165527_Saisonnalit%C3%A9.png)
-
 ### 📊 Produits les plus commandés et retournés par catégorie  
 
 ```sql
@@ -219,8 +207,6 @@ GROUP BY
   category
 ORDER BY 
   total_returns DESC; -- Trier par nombre de retours décroissant
-
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165729_Retours.png)
 
 ### 🏅 Top 10 clients  
 
@@ -254,8 +240,6 @@ ORDER BY
   total_spent DESC -- Trier par dépenses totales décroissant
 LIMIT 10; -- Top 10 clients
 
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165413_Top_10_clients.png)
-
 ### 📊 Segmentation par âge et chiffre d'affaires total  
 
 ```sql
@@ -278,8 +262,6 @@ GROUP BY
   age_group
 ORDER BY 
   total_revenue DESC; -- Trier par chiffre d'affaires décroissant
-
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20165956_Clients_%C3%A2ge.png)
 
 ### 📊 Segmentation par comportement d'achat (petits vs gros clients)  
 
@@ -308,8 +290,6 @@ GROUP BY
   spending_category
 ORDER BY 
   total_revenue DESC; -- Trier par chiffre d'affaires décroissant
-
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20170135_Cat%C3%A9gorie_d%C3%A9penses.png)
 
 ### 🔗 Nombre de commandes par source de trafic  
 
@@ -340,4 +320,20 @@ GROUP BY
 ORDER BY 
   total_orders_by_source DESC; -- Trier par total des commandes décroissant
 
-![Evolution des ventes](https://github.com/Arnaudl44/The_Look_E-commerce_-BigQuery_et_Looker_Studio/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-02-03%20170038_Trafic_source.png)
+## 🔚 Conclusion  
+
+Ce projet a permis de démontrer l'efficacité de BigQuery pour analyser de grandes quantités de données e-commerce. Voici les **principaux enseignements** :  
+
+1. **Analyse des ventes :** Les produits les plus vendus et les segments de clients les plus lucratifs ont été identifiés.  
+2. **Saisonnalité :** Une forte variabilité des ventes selon les mois a été constatée, offrant des pistes pour ajuster les stratégies marketing.  
+3. **Retour produit :** Les catégories avec des taux de retour élevés ont été mises en évidence, suggérant des optimisations dans la gestion des retours et la qualité produit.  
+4. **Segmentation client :** Une segmentation par âge et comportement d'achat a fourni des insights pour des campagnes ciblées.  
+
+Avec ces analyses, **The Look E-commerce** peut prendre des décisions plus éclairées pour améliorer ses performances globales.
+
+
+
+
+
+
+
