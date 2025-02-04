@@ -111,8 +111,6 @@ SELECT
 FROM 
   `thelook_ecommerce.order_items_x_products`;
 
----
-
 ### 📅 Principaux KPI's par année et mois  
 
 ```sql
