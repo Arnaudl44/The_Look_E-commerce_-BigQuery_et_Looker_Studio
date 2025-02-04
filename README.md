@@ -94,6 +94,8 @@ ON
 
 Après avoir exploré les données, j’ai décidé de concentrer l’analyse sur la **performance des ventes**.  
 
+---
+
 ### 🏆 Principaux KPI's  
 
 ```sql
