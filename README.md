@@ -40,7 +40,7 @@ Une fois les données disponibles dans BigQuery, j’ai effectué une **Explorat
 4. **Exploration de la table `events`** : Étude du comportement des utilisateurs sur le site, avec analyse des interactions (`cart`, `purchase`, `product`, `home`…), et vérification de l’impact des `user_id` null sur la navigation.  
 
 ⚡ **Les requêtes SQL utilisées pour l’EDA sont disponibles dans un dossier dédié.**  
-⚡ **Pour visualiser les KPI principaux, consultez les images disponibles dans le dossier images.**  
+⚡ **Pour visualiser les KPI principaux, consultez les images disponibles dans le dossier `images`.**  
 
 ---
 
@@ -112,6 +112,9 @@ SELECT
   COUNT(returned_at) AS total_products_returned
 FROM 
   `thelook_ecommerce.order_items_x_products`;
+```
+
+---
 
 ### 📅 Principaux KPI's par année et mois  
 
@@ -135,6 +138,9 @@ GROUP BY
   1, 2
 ORDER BY 
   1, 2;
+```
+
+---
 
 ### 📊 Répartition des utilisateurs selon le nombre de commandes passées  
 
@@ -158,6 +164,9 @@ GROUP BY
   total_orders
 ORDER BY 
   total_users DESC; -- Trier par nombre d'utilisateurs en ordre décroissant
+```
+
+---
 
 ### 📊 Répartition des commandes par nombre de produits  
 
@@ -171,6 +180,9 @@ GROUP BY
   num_of_item
 ORDER BY 
   number_of_orders DESC; -- Trier par nombre de commandes en ordre décroissant
+```
+
+---
 
 ### 📊 Saisonnalité des ventes  
 
@@ -193,6 +205,9 @@ GROUP BY
   mo
 ORDER BY 
   mo; -- Trier par mois
+```
+
+---
 
 ### 📊 Produits les plus commandés et retournés par catégorie  
 
@@ -207,6 +222,9 @@ GROUP BY
   category
 ORDER BY 
   total_returns DESC; -- Trier par nombre de retours décroissant
+```
+
+---
 
 ### 🏅 Top 10 clients  
 
@@ -239,6 +257,9 @@ FROM
 ORDER BY 
   total_spent DESC -- Trier par dépenses totales décroissant
 LIMIT 10; -- Top 10 clients
+```
+
+---
 
 ### 📊 Segmentation par âge et chiffre d'affaires total  
 
@@ -262,6 +283,9 @@ GROUP BY
   age_group
 ORDER BY 
   total_revenue DESC; -- Trier par chiffre d'affaires décroissant
+```
+
+---
 
 ### 📊 Segmentation par comportement d'achat (petits vs gros clients)  
 
@@ -290,6 +314,9 @@ GROUP BY
   spending_category
 ORDER BY 
   total_revenue DESC; -- Trier par chiffre d'affaires décroissant
+```
+
+---
 
 ### 🔗 Nombre de commandes par source de trafic  
 
@@ -319,6 +346,9 @@ GROUP BY
   traffic_source
 ORDER BY 
   total_orders_by_source DESC; -- Trier par total des commandes décroissant
+```
+
+---
 
 ## 🔚 Conclusion  
 
@@ -330,10 +360,3 @@ Ce projet a permis de démontrer l'efficacité de BigQuery pour analyser de gran
 4. **Segmentation client :** Une segmentation par âge et comportement d'achat a fourni des insights pour des campagnes ciblées.  
 
 Avec ces analyses, **The Look E-commerce** peut prendre des décisions plus éclairées pour améliorer ses performances globales.
-
-
-
-
-
-
-
