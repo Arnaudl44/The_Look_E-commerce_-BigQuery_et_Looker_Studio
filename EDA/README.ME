@@ -1,56 +1,55 @@
-# EDA (Exploratory Data Analysis) – The Look E-commerce
+# EDA (Exploratory Data Analysis) - The Look E-commerce
 
-## I - Table `orders`
+## I - Table orders
 
-### 1. Nombre de lignes dans la table `orders`
-
+### 1. Nombre de lignes dans la table orders
 ```sql
 SELECT *
 FROM `innate-path-415009.thelook_ecommerce.orders`;
-125 122 lignes
-2. Nombre de commandes et d'utilisateurs distincts
-sql
-Copier
-Modifier
+```
+**125 122 lignes**
+
+### 2. Nombre de commandes et d'utilisateur distincts
+```sql
 SELECT
   COUNT(DISTINCT order_id) AS number_of_orders,
   COUNT(DISTINCT user_id) AS number_of_customers,
   SUM(num_of_item) AS number_of_items_sold,
   SUM(num_of_item) / COUNT(DISTINCT order_id) AS average_items_per_order
 FROM `innate-path-415009.thelook_ecommerce.orders`;
-125 122 commandes,
-80 130 utilisateurs,
-181 652 produits vendus,
-1,45 produits par commande
-3. Nombre de commandes par genre
-sql
-Copier
-Modifier
+```
+- **125 122 commandes**
+- **80 130 utilisateurs**
+- **181 652 produits vendus**
+- **1,45 produits par commande**
+
+### 3. Nombre de commandes par genre
+```sql
 SELECT
   gender,
   COUNT(order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY gender;
-62 700 commandes par les femmes,
-62 422 commandes par les hommes
-4. Nombre de commandes par statut de commande
-sql
-Copier
-Modifier
+```
+- **62 700 commandes par les femmes**
+- **62 422 commandes par les hommes**
+
+### 4. Nombre de commandes par statut de commande
+```sql
 SELECT
   status,
   COUNT(DISTINCT order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY status;
-37 490 shipped,
-31 342 complete,
-24 971 processing,
-18 788 cancelled,
-12 531 returned
-5. Répartition des utilisateurs selon le nombre de commandes passées
-sql
-Copier
-Modifier
+```
+- **37 490 shipped**
+- **31 342 complete**
+- **24 971 processing**
+- **18 788 cancelled**
+- **12 531 returned**
+
+### 5. Répartition des utilisateurs selon le nombre de commandes passées
+```sql
 WITH total_orders AS (
   SELECT
     user_id,
@@ -64,28 +63,28 @@ SELECT
 FROM total_orders
 GROUP BY number_of_orders
 ORDER BY 2 DESC;
-1 commande : 50 149 utilisateurs
-2 commandes : 19 948 utilisateurs
-3 commandes : 5 055 utilisateurs
-4 commandes : 4 978 utilisateurs
-6. Répartition des commandes par nombre de produits
-sql
-Copier
-Modifier
+```
+- **1 commande : 50 149 utilisateurs**
+- **2 commandes : 19 948 utilisateurs**
+- **3 commandes : 5 055 utilisateurs**
+- **4 commandes : 4 978 utilisateurs**
+
+### 6. Répartition des commandes par nombre de produits
+```sql
 SELECT
   num_of_item,
   COUNT(order_id) AS number_of_orders
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY num_of_item
 ORDER BY 2 DESC;
-1 produit : 87 944 commandes
-2 produits : 25 018 commandes
-3 produits : 6 318 commandes
-4 produits : 6 292 commandes
-7. Nombre de commandes et d'utilisateurs par année
-sql
-Copier
-Modifier
+```
+- **1 produit : 87 944 commandes**
+- **2 produits : 25 018 commandes**
+- **3 produits : 6 318 commandes**
+- **4 produits : 6 292 commandes**
+
+### 7. Nombre de commandes et d'utilisateurs par année
+```sql
 SELECT
   EXTRACT(YEAR FROM created_at) AS yr,
   COUNT(DISTINCT order_id) AS number_of_orders,
@@ -93,12 +92,12 @@ SELECT
 FROM `innate-path-415009.thelook_ecommerce.orders`
 GROUP BY 1
 ORDER BY 1;
-En 2019 (année incomplète) : 2 193 commandes, 2 050 utilisateurs
-En 2024 : 39 866 commandes, 30 793 utilisateurs
-8. Nombre de commandes et d'utilisateurs par mois (2019 - 2024)
-sql
-Copier
-Modifier
+```
+- **2019 (année incomplète)** : 2 193 commandes, 2 050 utilisateurs
+- **2024** : 39 866 commandes, 30 793 utilisateurs
+
+### 8. Nombre de commandes et d'utilisateurs par mois sur l'ensemble de la période 2019 - 2024
+```sql
 SELECT
   EXTRACT(MONTH FROM created_at) AS mo,
   COUNT(DISTINCT order_id) AS number_of_orders,
@@ -109,12 +108,12 @@ GROUP BY
   1
 ORDER BY
   1;
-Juin : activité la plus soutenue.
-Activité en hausse de mars à juin, puis en baisse à partir de juillet.
-9. Nombre de commandes par statut, année et mois
-sql
-Copier
-Modifier
+```
+- **Juin** : Activité la plus soutenue
+- Activité en hausse de **mars à juin**, puis en baisse à partir de juillet
+
+### 9. Nombre de commandes par statut, année et mois
+```sql
 SELECT
   EXTRACT(YEAR FROM created_at) AS yr,
   COUNT(order_id) AS total_orders,
@@ -134,12 +133,12 @@ GROUP BY
   1
 ORDER BY 
   1;
-Taux de retour : Stable autour de 10%
-Taux d'abandon : Stable autour de 15%
-10. Délais moyens de livraison
-sql
-Copier
-Modifier
+```
+- **Taux de retour** : Stable (10%)
+- **Taux d'abandon** : Stable (15%)
+
+### 10. Délais moyens de livraison
+```sql
 WITH CTE AS (
   SELECT
     order_id,
@@ -154,11 +153,11 @@ SELECT
 FROM CTE
 GROUP BY 1
 ORDER BY 1;
-Délais de livraison stables sur la période (~2 jours)
-11. Délais moyens d'envoi
-sql
-Copier
-Modifier
+```
+- **Délais moyens de livraison** : Environ 2 jours
+
+### 11. Délais moyens d'envoi
+```sql
 WITH CTE AS (
   SELECT
     order_id,
@@ -173,3 +172,7 @@ SELECT
 FROM CTE
 GROUP BY 1
 ORDER BY 1;
+```
+- **Délais moyens d'envoi** : Environ 1 jour
+
+(Le contenu complet des requêtes a été condensé ici pour séparer chaque table dans le fichier.)
